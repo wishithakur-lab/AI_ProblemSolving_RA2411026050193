@@ -1,0 +1,23 @@
+from flask import Flask, render_template, request, jsonify
+import time
+
+app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+@app.route("/move", methods=["POST"])
+def move():
+    data = request.json
+    board = data["board"]
+
+    # simple AI (first empty spot)
+    for i in range(9):
+        if board[i] == "":
+            return jsonify({"move": i})
+
+    return jsonify({"move": -1})
+
+if __name__ == "__main__":
+    app.run(debug=True)
