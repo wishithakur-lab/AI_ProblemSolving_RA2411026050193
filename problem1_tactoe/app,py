@@ -1,23 +1,40 @@
-from flask import Flask, render_template, request, jsonify
+
+from minimax import minimax, nodes_explored, check_winner
+from alphabeta import alphabeta, nodes_explored_ab
 import time
-
-app = Flask(__name__)
-
-@app.route("/")
-def index():
-    return render_template("index.html")
 
 @app.route("/move", methods=["POST"])
 def move():
     data = request.json
     board = data["board"]
 
-    # simple AI (first empty spot)
+    # -------- MINIMAX --------
+    start = time.time()
+    best_move = -1
+    best_val = -100
+
     for i in range(9):
         if board[i] == "":
-            return jsonify({"move": i})
+            board[i] = "O"
+            val = minimax(board, False)
+            board[i] = ""
+            if val > best_val:
+                best_val = val
+                best_move = i
 
-    return jsonify({"move": -1})
+    minimax_time = time.time() - start
 
-if __name__ == "__main__":
-    app.run(debug=True)
+    # -------- ALPHA-BETA --------
+    start = time.time()
+    for i in range(9):
+        if board[i] == "":
+            board[i] = "O"
+            alphabeta(board, -100, 100, False)
+            board[i] = ""
+    ab_time = time.time() - start
+
+    return jsonify({
+        "move": best_move,
+        "minimax_time": minimax_time,
+        "alphabeta_time": ab_time
+    })
