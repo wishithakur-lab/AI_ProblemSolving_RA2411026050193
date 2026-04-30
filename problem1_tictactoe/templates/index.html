@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tic Tac Toe</title>
+</head>
+<body>
+<h1>Tic Tac Toe AI</h1>
+
+<div id="board"></div>
+
+<script>
+let board = ["","","","","","","","",""];
+
+function makeMove(i){
+    if(board[i] !== "") return;
+    board[i] = "X";
+
+    fetch("/move", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({board: board})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if(data.move !== -1){
+            board[data.move] = "O";
+        }
+        render();
+    });
+
+    render();
+}
+
+function render(){
+    let html = "";
+    for(let i=0;i<9;i++){
+        html += `<button onclick="makeMove(${i})">${board[i]}</button>`;
+    }
+    document.getElementById("board").innerHTML = html;
+}
+
+render();
+</script>
+
+</body>
+</html>
